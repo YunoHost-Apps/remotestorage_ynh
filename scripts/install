@@ -34,13 +34,13 @@ sudo yunohost app checkurl "${domain}${path}" -a "$app" \
 # Copy source files
 src_path=/var/www/$app
 path_temp=/var/www
-
+sudo mkdir -p $src_path
 
 
 sudo wget -P "$path_temp" https://github.com/fkooman/php-remote-storage/releases/download/1.0.3/php-remote-storage-1.0.3.tar.xz
-sudo tar -xJf "$path_temp"/php-remote-storage-1.0.3.tar.xz
+sudo tar -xJf "$path_temp"/php-remote-storage-1.0.3.tar.xz -C "$src_path"
 sudo rm "$path_temp"/php-remote-storage-1.0.3.tar.xz
-sudo mv "$path_temp"/php-remote-storage-1.0.3 "$src_path"
+#sudo mv "$path_temp"/php-remote-storage-1.0.3 "$src_path"
 sudo cp "$src_path"/config/server.yaml.example "$src_path"/config/server.yaml
 sudo bin/add-user alex alex
 sudo mkdir "$src_path"/data
