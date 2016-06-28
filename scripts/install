@@ -42,7 +42,7 @@ sudo tar -xJf "$path_temp"/php-remote-storage-1.0.3.tar.xz -C "$path_temp"
 sudo rm "$path_temp"/php-remote-storage-1.0.3.tar.xz
 sudo mv "$path_temp"/php-remote-storage-1.0.3 "$src_path"
 sudo cp "$src_path"/config/server.yaml.example "$src_path"/config/server.yaml
-sudo bin/add-user alex alex
+sudo "$src_path"bin/add-user alex alex
 sudo mkdir "$src_path"/data
 sudo chown www-data.www-data "$src_path"/data
 
