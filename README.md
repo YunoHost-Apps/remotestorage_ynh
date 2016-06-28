@@ -1,9 +1,8 @@
-Laverna package for Yunohost
+remoteStorage package for Yunohost
 -------------
 
-Laverna prebuilt package for Yunohost
+php-remote-storage package for Yunohost
 
 Links
 -------------
-- Laverna : https://laverna.cc/index.html
 - YunoHost : https://yunohost.org/
