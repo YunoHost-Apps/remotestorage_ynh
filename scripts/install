@@ -41,11 +41,11 @@ sudo mkdir -p $src_path
 sudo wget -P "$path_temp" https://github.com/fkooman/php-remote-storage/releases/download/1.0.3/php-remote-storage-1.0.3.tar.xz
 sudo tar -xJf "$path_temp"/php-remote-storage-1.0.3.tar.xz
 sudo rm "$path_temp"/php-remote-storage-1.0.3.tar.xz
-sudo mv "$path_temp"/php-remote-storage-1.0.3 "$src_path"
-sudo cp "$src_path"/config/server.yaml.example "$src_path"/config/server.yaml
-sudo bin/add-user alex alex
-sudo mkdir "$src_path"/data
-sudo chown www-data.www-data "$src_path"/data
+#sudo mv "$path_temp"/php-remote-storage-1.0.3 "$src_path"
+#sudo cp "$src_path"/config/server.yaml.example "$src_path"/config/server.yaml
+#sudo bin/add-user alex alex
+#sudo mkdir "$src_path"/data
+#sudo chown www-data.www-data "$src_path"/data
 
 
 # Set permissions to app files
