@@ -33,19 +33,19 @@ sudo yunohost app checkurl "${domain}${path}" -a "$app" \
 
 # Copy source files
 src_path=/var/www/$app
-path=/var/www
+path_temp=/var/www
 sudo mkdir -p $src_path
 
 
 
-sudo wget -P "$path" https://github.com/fkooman/php-remote-storage/releases/download/1.0.3/php-remote-storage-1.0.3.tar.xz
-sudo tar -xJf "$path"/php-remote-storage-1.0.3.tar.xz
-sudo rm "$path"/php-remote-storage-1.0.3.tar.xz
-sudo mv "$path"/php-remote-storage-1.0.3 "$path"/remoteStorage
-sudo cp "$path"/remoteStorage/config/server.yaml.example "$path"/remoteStorage/config/server.yaml
+sudo wget -P "$path_temp" https://github.com/fkooman/php-remote-storage/releases/download/1.0.3/php-remote-storage-1.0.3.tar.xz
+sudo tar -xJf "$path_temp"/php-remote-storage-1.0.3.tar.xz
+sudo rm "$path_temp"/php-remote-storage-1.0.3.tar.xz
+sudo mv "$path_temp"/php-remote-storage-1.0.3 "$src_path"
+sudo cp "$src_path"/config/server.yaml.example "$src_path"/config/server.yaml
 sudo bin/add-user alex alex
-sudo mkdir "$path"/remoteStorage/data
-sudo chown www-data.www-data "$path"/remoteStorage/data
+sudo mkdir "$src_path"/data
+sudo chown www-data.www-data "$src_path"/data
 
 
 # Set permissions to app files
@@ -55,7 +55,7 @@ sudo chown -R root: $src_path
 # Modify Nginx configuration file and copy it to Nginx conf directory
 nginx_conf=../conf/nginx.conf
 sed -i "s@YNH_WWW_PATH@$path@g" $nginx_conf
-sed -i "s@YNH_WWW_ALIAS@$src_path/@g" $nginx_conf
+sed -i "s@YNH_WWW_ALIAS@$src_path/web/@g" $nginx_conf
 sudo cp $nginx_conf /etc/nginx/conf.d/$domain.d/$app.conf
 
 # If app is public, add url to SSOWat conf as skipped_uris
