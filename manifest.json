@@ -40,8 +40,8 @@
                     "en": "Choose a path for Laverna",
                     "fr": "Choisissez un chemin pour Laverna"
                 },
-                "example": "/remotestorage",
-                "default": "/remotestorage"
+                "example": "/remoteStorage",
+                "default": "/remoteStorage"
             },
             {
                 "name": "admin",
