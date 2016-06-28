@@ -33,12 +33,20 @@ sudo yunohost app checkurl "${domain}${path}" -a "$app" \
 
 # Copy source files
 src_path=/var/www/$app
+path=/var/www
 sudo mkdir -p $src_path
-sudo wget -P "$src_path" https://github.com/Laverna/static-laverna/archive/gh-pages.zip -O "$src_path"/laverna.zip
-sudo unzip "$src_path"/laverna.zip -d "$src_path"
-sudo cp -R "$src_path"/static-laverna-gh-pages/* "$src_path"
-sudo rm "$src_path"/laverna.zip
-sudo rm -rf "$src_path"/static-laverna-gh-pages
+
+
+
+sudo wget -P "$path" https://github.com/fkooman/php-remote-storage/releases/download/1.0.3/php-remote-storage-1.0.3.tar.xz
+sudo tar -xJf "$path"/php-remote-storage-1.0.3.tar.xz
+sudo rm "$path"/php-remote-storage-1.0.3.tar.xz
+sudo mv "$path"/php-remote-storage-1.0.3 "$path"/remoteStorage
+sudo cp "$path"/remoteStorage/config/server.yaml.example "$path"/remoteStorage/config/server.yaml
+sudo bin/add-user alex alex
+sudo mkdir "$path"/remoteStorage/data
+sudo chown www-data.www-data "$path"/remoteStorage/data
+
 
 # Set permissions to app files
 sudo chown -R root: $src_path
