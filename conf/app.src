@@ -1,0 +1,6 @@
+SOURCE_URL=https://github.com/fkooman/php-remote-storage/archive/1.0.5.zip
+SOURCE_SUM=e7966a6820782e3937659c490690ae2b
+SOURCE_SUM_PRG=md5sum
+SOURCE_FORMAT=zip
+SOURCE_IN_SUBDIR=true
+SOURCE_FILENAME=

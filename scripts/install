@@ -1,8 +1,32 @@
 #!/bin/bash
 
-# Exit on command errors and treat unset variables as an error
-set -eu
+#=================================================
+# GENERIC START
+#=================================================
+# IMPORT GENERIC HELPERS
+#=================================================
 
+source _common.sh
+source /usr/share/yunohost/helpers
+
+#=================================================
+# MANAGE SCRIPT FAILURE
+#=================================================
+
+# Exit if an error occurs during the execution of the script
+ynh_abort_if_errors
+
+#=================================================
+# RETRIEVE ARGUMENTS FROM THE MANIFEST
+#=================================================
+
+domain=$YNH_APP_ARG_DOMAIN
+path_url=$YNH_APP_ARG_PATH
+admin=$YNH_APP_ARG_ADMIN
+admin_password=$YNH_APP_ARG_PASSWORD
+is_public=$YNH_APP_ARG_IS_PUBLIC
+
+# This is a multi-instance app, meaning it can be installed several times independently
 # The id of the app as stated in the manifest is available as $YNH_APP_ID
 # The instance number is available as $YNH_APP_INSTANCE_NUMBER (equals "1", "2", ...)
 # The app instance name is available as $YNH_APP_INSTANCE_NAME
@@ -14,54 +38,112 @@ set -eu
 # db names, ...
 app=$YNH_APP_INSTANCE_NAME
 
-# Retrieve arguments
-domain=$YNH_APP_ARG_DOMAIN
-path=$YNH_APP_ARG_PATH
-admin=$YNH_APP_ARG_ADMIN
-is_public=$YNH_APP_ARG_IS_PUBLIC
-
-# Source YunoHost helpers
-source /usr/share/yunohost/helpers
-
 # Save app settings
 ynh_app_setting_set "$app" admin "$admin"
 ynh_app_setting_set "$app" is_public "$is_public"
 
-# Check domain/path availability
-sudo yunohost app checkurl "${domain}${path}" -a "$app" \
-    || ynh_die "Path not available: ${domain}${path}"
+#=================================================
+# CHECK IF THE APP CAN BE INSTALLED WITH THESE ARGS
+#=================================================
 
-# Copy source files
-src_path=/var/www/$app
-path_temp=/var/www
-#sudo mkdir -p $src_path
+final_path=/var/www/$app
+test ! -e "$final_path" || ynh_die "This path already contains a folder"
+
+# Normalize the url path syntax
+path_url=$(ynh_normalize_url_path $path_url)
+
+# Check web path availability
+ynh_webpath_available $domain $path_url
+# Register (book) web path
+ynh_webpath_register $app $domain $path_url
+
+# Check password strength
+[[ ${#admin_password} -gt 6 ]] || ynh_die \
+"The password is too weak, it must be longer than 6 characters"
+
+#=================================================
+# STORE SETTINGS FROM MANIFEST
+#=================================================
+
+ynh_app_setting_set $app domain $domain
+ynh_app_setting_set $app path $path_url
+ynh_app_setting_set $app admin $admin
+ynh_app_setting_set $app is_public $is_public
+ynh_app_setting_set $app language $language
+
+#=================================================
+# INSTALL DEPENDENCIES
+#=================================================
+
+ynh_install_app_dependencies $pkg_dependencies
 
 
-sudo wget -P "$path_temp" https://github.com/fkooman/php-remote-storage/releases/download/1.0.3/php-remote-storage-1.0.3.tar.xz
-sudo tar -xJf "$path_temp"/php-remote-storage-1.0.3.tar.xz -C "$path_temp"
-sudo rm "$path_temp"/php-remote-storage-1.0.3.tar.xz
-sudo mv "$path_temp"/php-remote-storage-1.0.3 "$src_path"
-sudo cp "$src_path"/config/server.yaml.example "$src_path"/config/server.yaml
-sudo "$src_path"/bin/add-user alex alex
-sudo mkdir "$src_path"/data
-sudo chown www-data.www-data "$src_path"/data
+#=================================================
+# DOWNLOAD, CHECK AND UNPACK SOURCE
+#=================================================
+
+ynh_app_setting_set $app final_path $final_path
+# Download, check integrity, uncompress and patch the source from app.src
+ynh_setup_source "$final_path"
+
+#=================================================
+# SPECIFIC SETUP
+#=================================================
+
+# Create a directory data
+mkdir -p $final_path/data
+
+# Create config/server.yaml
+sudo cp $final_path/config/server.yaml.example $final_path/config/server.yaml
+
+# Create first user
+sudo php $final_path/bin/add-user.php $admin $admin_password
+
+# Install and initialize Composer
+init_composer $final_path
+
+#=================================================
+# NGINX CONFIGURATION
+#=================================================
+
+# Create a dedicated nginx config
+ynh_add_nginx_config
 
 
-# Set permissions to app files
-sudo chown -R root: $src_path
+#=================================================
+# CREATE DEDICATED USER
+#=================================================
 
+# Create a system user
+ynh_system_user_create $app
 
-# Modify Nginx configuration file and copy it to Nginx conf directory
-nginx_conf=../conf/nginx.conf
-sed -i "s@YNH_WWW_PATH@$path@g" $nginx_conf
-sed -i "s@YNH_WWW_ALIAS@$src_path/web/@g" $nginx_conf
-sudo cp $nginx_conf /etc/nginx/conf.d/$domain.d/$app.conf
+#=================================================
+# PHP-FPM CONFIGURATION
+#=================================================
 
-# If app is public, add url to SSOWat conf as skipped_uris
-if [[ $is_public -eq 1 ]]; then
-  # unprotected_uris allows SSO credentials to be passed anyway.
-  ynh_app_setting_set "$app" unprotected_uris "/"
+# Create a dedicated php-fpm config
+ynh_add_fpm_config
+
+# Set right permissions for curl install
+chown -R $app: $final_path
+
+#=================================================
+# SETUP SSOWAT
+#=================================================
+
+if [ $is_public -eq 0 ]
+then	# Remove the public access
+	ynh_app_setting_delete $app skipped_uris
+fi
+# Make app public if necessary
+if [ $is_public -eq 1 ]
+then
+	# unprotected_uris allows SSO credentials to be passed anyway.
+	ynh_app_setting_set $app unprotected_uris "/"
 fi
 
-# Reload services
-sudo service nginx reload
+#=================================================
+# RELOAD NGINX
+#=================================================
+
+systemctl reload nginx
