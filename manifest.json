@@ -3,14 +3,14 @@
     "id": "Remotestorage",
     "packaging_format": 1,
     "description": {
-        "en": "This is a remoteStorage server implementation written in PHP."
+        "en": "This is a remoteStorage server implementation written in PHP.",
+        "fr": "This is a remoteStorage server implementation written in PHP."
     },
     "url": "https://github.com/fkooman/php-remote-storage",
     "license": "free",
     "maintainer": {
         "name": "Anmol Sharma",
-        "email": "anmol@datamol.org",
-        "url": ""
+        "email": "anmol@datamol.org"
     },
     "requirements": {
         "yunohost": ">> 2.4.0"
@@ -58,6 +58,8 @@
                     "en": "Password for the user account (At least 6 characters long)",
                     "fr": "Password for the user account (At least 6 characters long)"
                 },
+
+                "example": "mystrongpassword"
             {
                 "name": "is_public",
                 "type": "boolean",
