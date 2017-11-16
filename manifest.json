@@ -27,24 +27,13 @@
                 "name": "domain",
 		            "type": "domain",
                 "ask": {
-                    "en": "Choose a domain name for Remotestorage",
-                    "fr": "Choisissez un nom de domaine pour Remotestorage"
+                    "en": "Choose a domain name for Remotestorage[Will install on domain or sub-domain]",
+                    "fr": "Choisissez un nom de domaine pour Remotestorage[Will install on domain or sub-domain]"
                 },
                 "example": "example.com"
             },
             {
-                "name": "path",
-		            "type": "path",
-                "ask": {
-                    "en": "Choose a path for Remotestorage",
-                    "fr": "Choisissez un chemin pour Remotestorage"
-                },
-                "example": "/remoteStorage",
-                "default": "/remoteStorage"
-            },
-            {
                 "name": "admin",
-		            "type": "user",
                 "ask": {
                     "en": "Choose an user (Not a LDAP User)",
                     "fr": "Choisissez l’user (Not a LDAP User)"
@@ -60,6 +49,7 @@
                 },
 
                 "example": "mystrongpassword"
+            },
             {
                 "name": "is_public",
                 "type": "boolean",

@@ -21,7 +21,7 @@ ynh_abort_if_errors
 #=================================================
 
 domain=$YNH_APP_ARG_DOMAIN
-path_url=$YNH_APP_ARG_PATH
+path_url="/"
 admin=$YNH_APP_ARG_ADMIN
 admin_password=$YNH_APP_ARG_PASSWORD
 is_public=$YNH_APP_ARG_IS_PUBLIC
@@ -69,13 +69,13 @@ ynh_app_setting_set $app domain $domain
 ynh_app_setting_set $app path $path_url
 ynh_app_setting_set $app admin $admin
 ynh_app_setting_set $app is_public $is_public
-ynh_app_setting_set $app language $language
 
 #=================================================
 # INSTALL DEPENDENCIES
 #=================================================
 
-ynh_install_app_dependencies $pkg_dependencies
+
+ynh_package_install $pkg_dependencies
 
 
 #=================================================
@@ -86,21 +86,6 @@ ynh_app_setting_set $app final_path $final_path
 # Download, check integrity, uncompress and patch the source from app.src
 ynh_setup_source "$final_path"
 
-#=================================================
-# SPECIFIC SETUP
-#=================================================
-
-# Create a directory data
-mkdir -p $final_path/data
-
-# Create config/server.yaml
-sudo cp $final_path/config/server.yaml.example $final_path/config/server.yaml
-
-# Create first user
-sudo php $final_path/bin/add-user.php $admin $admin_password
-
-# Install and initialize Composer
-init_composer $final_path
 
 #=================================================
 # NGINX CONFIGURATION
@@ -108,7 +93,6 @@ init_composer $final_path
 
 # Create a dedicated nginx config
 ynh_add_nginx_config
-
 
 #=================================================
 # CREATE DEDICATED USER
@@ -123,6 +107,24 @@ ynh_system_user_create $app
 
 # Create a dedicated php-fpm config
 ynh_add_fpm_config
+
+
+
+#=================================================
+# SPECIFIC SETUP
+#=================================================
+
+# Create a directory data
+mkdir -p $final_path/data
+
+# Create config/server.yaml
+sudo cp $final_path/config/server.yaml.example $final_path/config/server.yaml
+
+# Install and initialize Composer
+cd $final_path && composer install
+
+# Create first user
+sudo php $final_path/bin/add-user.php $admin $admin_password
 
 # Set right permissions for curl install
 chown -R $app: $final_path
@@ -141,6 +143,8 @@ then
 	# unprotected_uris allows SSO credentials to be passed anyway.
 	ynh_app_setting_set $app unprotected_uris "/"
 fi
+
+
 
 #=================================================
 # RELOAD NGINX
