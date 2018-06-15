@@ -38,9 +38,6 @@ is_public=$YNH_APP_ARG_IS_PUBLIC
 # db names, ...
 app=$YNH_APP_INSTANCE_NAME
 
-# Save app settings
-ynh_app_setting_set "$app" admin "$admin"
-ynh_app_setting_set "$app" is_public "$is_public"
 
 #=================================================
 # CHECK IF THE APP CAN BE INSTALLED WITH THESE ARGS
@@ -75,7 +72,7 @@ ynh_app_setting_set $app is_public $is_public
 #=================================================
 
 
-ynh_package_install $pkg_dependencies
+ynh_install_app_dependencies php php-mbstring php-curl libapache2-mod-xsendfile php-sqlite3 php5-sqlite
 
 
 #=================================================
@@ -120,8 +117,11 @@ mkdir -p $final_path/data
 # Create config/server.yaml
 sudo cp $final_path/config/server.yaml.example $final_path/config/server.yaml
 
-# Install and initialize Composer
-cd $final_path && composer install
+#=================================================
+# INSTALL AND INITIALIZE COMPOSER
+#=================================================
+
+init_composer "$final_path"
 
 # Create first user
 sudo php $final_path/bin/add-user.php $admin $admin_password
