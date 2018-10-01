@@ -124,7 +124,7 @@ sudo cp $final_path/config/server.yaml.example $final_path/config/server.yaml
 
 
 # Create first user
-sudo php $final_path/bin/add-user.php $admin $admin_password
+( cd $final_path &&  php bin/add-user.php $admin $admin_password )
 
 # Set right permissions for curl install
 chown -R $app: $final_path
