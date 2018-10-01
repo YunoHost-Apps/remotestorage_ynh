@@ -41,7 +41,7 @@ sudo chown -R root: "$src_path"
 # Restore NGINX configuration
 sudo cp -a ./nginx.conf "/etc/nginx/conf.d/${domain}.d/${app}.conf"
 
-ynh_install_app_dependencies php php-mbstring php-curl libapache2-mod-xsendfile php-sqlite3 php-pdo
+ynh_install_app_dependencies php php-mbstring php-curl libapache2-mod-xsendfile php-sqlite3 php7.0-pdo
 
 ### PHP (remove if not used) ###
 # If a dedicated php-fpm process is used:
