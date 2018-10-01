@@ -5,7 +5,7 @@
 #
 # $app should be defined when calling this helper
 # DEPENDENCIES
-pkg_dependencies="php php-mbstring php-curl libapache2-mod-xsendfile php-sqlite3 php5-sqlite"
+'php-mbstring|base-files(<<9.0)'  'php-curl|php5-curl' 'php-pdo|base-files(<<9.0)' libapache2-mod-xsendfile 'php-sqlite3|php5-sqlite'
 # usage: ynh_remove_file_checksum file
 # | arg: file - The file for which the checksum will be deleted
 ynh_delete_file_checksum () {

@@ -72,7 +72,7 @@ ynh_app_setting_set $app is_public $is_public
 #=================================================
 
 
-ynh_install_app_dependencies php php-mbstring php-curl libapache2-mod-xsendfile php-sqlite3 php5-sqlite
+ynh_install_app_dependencies 'php-mbstring|base-files(<<9.0)'  'php-curl|php5-curl' 'php-pdo|base-files(<<9.0)' libapache2-mod-xsendfile 'php-sqlite3|php5-sqlite'
 
 
 #=================================================
