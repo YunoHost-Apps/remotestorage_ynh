@@ -1,6 +1,6 @@
 {
     "name": "remoteStorage",
-    "id": "Remotestorage",
+    "id": "remotestorage",
     "packaging_format": 1,
     "description": {
         "en": "This is a remoteStorage server implementation written in PHP.",
