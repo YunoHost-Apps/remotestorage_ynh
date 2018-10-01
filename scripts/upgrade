@@ -52,7 +52,7 @@ fi
 path_url=$(ynh_normalize_url_path $path_url)
 
 
-ynh_install_app_dependencies 'php-mbstring|base-files(<<9.0)'  'php-curl|php5-curl' 'php-pdo|base-files(<<9.0)' libapache2-mod-xsendfile 'php-sqlite3|php5-sqlite'
+ynh_install_app_dependencies php php-mbstring php-curl libapache2-mod-xsendfile php-sqlite3 php-pdo
 # Set permissions to app files
 # you may need to make some file and/or directory writeable by www-data (nginx user)
 sudo chown -R root: $src_path
