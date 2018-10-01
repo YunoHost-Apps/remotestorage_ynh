@@ -122,7 +122,7 @@ sudo cp $final_path/config/server.yaml.example $final_path/config/server.yaml
 # INSTALL AND INITIALIZE COMPOSER
 #=================================================
 
-(cd $final_path && composer install)
+(cd $final_path &&  php composer install)
 # Create first user
 sudo php $final_path/bin/add-user.php $admin $admin_password
 
