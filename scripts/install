@@ -101,7 +101,7 @@ phpversion=$(ynh_app_setting_get --app=$app --key=phpversion)
 mkdir -p $final_path/data
 
 # Create config/server.yaml
-ynh_add_config --template="../config/server.yaml.example" --destination="$final_path/config/server.yaml"
+ynh_add_config --template="../conf/server.yaml.example" --destination="$final_path/config/server.yaml"
 
 #=================================================
 # INSTALL LYCHEE WITH COMPOSER
