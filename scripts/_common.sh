@@ -1,44 +1,25 @@
 #!/bin/bash
 
-# ============= FUTURE YUNOHOST HELPER =============
-# Delete a file checksum from the app settings
-#
-# $app should be defined when calling this helper
-# DEPENDENCIES
-'php-mbstring|base-files(<<9.0)'  'php-curl|php5-curl' 'php-pdo|base-files(<<9.0)' libapache2-mod-xsendfile 'php-sqlite3|php5-sqlite'
-# usage: ynh_remove_file_checksum file
-# | arg: file - The file for which the checksum will be deleted
-ynh_delete_file_checksum () {
-	local checksum_setting_name=checksum_${1//[\/ ]/_}	# Replace all '/' and ' ' by '_'
-	ynh_app_setting_delete $app $checksum_setting_name
-}
+#=================================================
+# COMMON VARIABLES
+#=================================================
 
-# Execute a composer command from a given directory
-# usage: composer_exec workdir COMMAND [ARG ...]
-exec_composer() {
-  local workdir=$1
-  shift 1
+YNH_PHP_VERSION="7.3"
 
-  COMPOSER_HOME="${workdir}/.composer" \
-    php "${workdir}/composer.phar" $@ \
-      -d "${workdir}" --quiet --no-interaction
-}
+YNH_COMPOSER_VERSION="2.0.13"
 
-# Install and initialize Composer in the given directory
-# usage: init_composer destdir
-init_composer() {
-  local destdir=$1
+extra_php_dependencies="php${YNH_PHP_VERSION}-sqlite3 php${YNH_PHP_VERSION}-spdo php${YNH_PHP_VERSION}mbstring php${YNH_PHP_VERSION}curl"
 
-  # install composer
-  curl -sS https://getcomposer.org/installer \
-    | COMPOSER_HOME="${destdir}/.composer" \
-        php -- --quiet --install-dir="$destdir" \
-    || ynh_die "Unable to install Composer"
+pkg_dependencies="libapache2-mod-xsendfile"
 
-  # install composer.json
-  cp "${destdir}/composer.json-dist" "${destdir}/composer.json"
+#=================================================
+# PERSONAL HELPERS
+#=================================================
 
-  # update dependencies to create composer.lock
-  exec_composer "$destdir" install --no-dev \
-    || ynh_die "Unable to update Remoteserver core dependencies"
-}
+#=================================================
+# EXPERIMENTAL HELPERS
+#=================================================
+
+#=================================================
+# FUTURE OFFICIAL HELPERS
+#=================================================
