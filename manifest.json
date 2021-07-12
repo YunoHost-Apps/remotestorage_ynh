@@ -7,7 +7,7 @@
         "fr": "This is a remoteStorage server implementation written in PHP."
     },
     "url": "https://github.com/fkooman/php-remote-storage",
-    "license": "free",
+    "license": "AGPL",
     "maintainer": {
         "name": "Anmol Sharma",
         "email": "anmol@datamol.org"
