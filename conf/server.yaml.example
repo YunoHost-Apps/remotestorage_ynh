@@ -5,4 +5,4 @@
 serverMode: production
 
 # Users
-Users: __ADMIN__
+Users:
