@@ -49,13 +49,6 @@ ynh_app_setting_set --app=$app --key=path --value=$path_url
 ynh_app_setting_set --app=$app --key=admin --value=$admin
 
 #=================================================
-# INSTALL DEPENDENCIES
-#=================================================
-ynh_script_progression --message="Installing dependencies..." --weight=1
-
-#ynh_install_app_dependencies $pkg_dependencies
-
-#=================================================
 # CREATE DEDICATED USER
 #=================================================
 ynh_script_progression --message="Configuring system user..." --weight=1
@@ -99,6 +92,7 @@ phpversion=$(ynh_app_setting_get --app=$app --key=phpversion)
 
 # Create a directory data
 mkdir -p $final_path/data
+chown -R $app:www-data "$final_path/data"
 
 # Create config/server.yaml
 ynh_add_config --template="../conf/server.yaml.example" --destination="$final_path/config/server.yaml"
