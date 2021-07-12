@@ -23,7 +23,7 @@ ynh_abort_if_errors
 domain=$YNH_APP_ARG_DOMAIN
 path_url="/"
 admin=$YNH_APP_ARG_ADMIN
-admin_password=$YNH_APP_ARG_PASSWORD
+password=$YNH_APP_ARG_PASSWORD
 is_public=$YNH_APP_ARG_IS_PUBLIC
 
 app=$YNH_APP_INSTANCE_NAME
@@ -95,17 +95,17 @@ mkdir -p $final_path/data
 chown -R $app:www-data "$final_path/data"
 
 # Create config/server.yaml
-ynh_add_config --template="../conf/server.yaml.example" --destination="$final_path/config/server.yaml"
+cp config/server.yaml.example config/server.yaml
 
 #=================================================
-# INSTALL LYCHEE WITH COMPOSER
+# INSTALL COMPOSER
 #=================================================
 ynh_script_progression --message="Installing Composer..." --weight=15
 
-ynh_install_composer --install_args="--ignore-platform-reqs"
+#ynh_install_composer --install_args="--ignore-platform-reqs"
 
 # Create first user
-php $final_path/bin/add-user.php $admin $admin_password
+php$phpversion $final_path/bin/add-user.php $admin $password
 
 #=================================================
 # SETUP SSOWAT
