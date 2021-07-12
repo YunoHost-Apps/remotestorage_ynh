@@ -95,7 +95,7 @@ mkdir -p $final_path/data
 chown -R $app:www-data "$final_path/data"
 
 # Create config/server.yaml
-cp config/server.yaml.example config/server.yaml
+cp $final_path/config/server.yaml.example $final_path/config/server.yaml
 
 #=================================================
 # INSTALL COMPOSER
