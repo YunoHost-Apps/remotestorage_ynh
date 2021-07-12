@@ -19,7 +19,6 @@ app=$YNH_APP_INSTANCE_NAME
 domain=$(ynh_app_setting_get "$app" domain)
 path=$(ynh_app_setting_get "$app" path)
 admin=$(ynh_app_setting_get "$app" admin)
-is_public=$(ynh_app_setting_get "$app" is_public)
 language=$(ynh_app_setting_get "$app" language)
 
 # Remove trailing "/" for next commands
@@ -28,66 +27,76 @@ path=${path%/}
 #=================================================
 # ENSURE DOWNWARD COMPATIBILITY
 #=================================================
-
-# Fix is_public as a boolean value
-if [ "$is_public" = "Yes" ]; then
-	ynh_app_setting_set $app is_public 1
-	is_public=1
-elif [ "$is_public" = "No" ]; then
-	ynh_app_setting_set $app is_public 0
-	is_public=0
-fi
+ynh_script_progression --message="Ensuring downward compatibility..." --time --weight=1
 
 # If final_path doesn't exist, create it
-if [ -z $final_path ]; then
+if [ -z "$final_path" ]; then
 	final_path=/var/www/$app
-	ynh_app_setting_set $app final_path $final_path
+	ynh_app_setting_set --app=$app --key=final_path --value=$final_path
+fi
+
+# Cleaning legacy permissions
+if ynh_legacy_permissions_exists; then
+	ynh_legacy_permissions_delete_all
+
+	ynh_app_setting_delete --app=$app --key=is_public
 fi
 
 #=================================================
-# CHECK THE PATH
+# DOWNLOAD, CHECK AND UNPACK SOURCE
 #=================================================
 
-# Normalize the URL path syntax
-path_url=$(ynh_normalize_url_path $path_url)
+if [ "$upgrade_type" == "UPGRADE_APP" ]
+then
+	ynh_script_progression --message="Upgrading source files..." --time --weight=1
 
+	# Download, check integrity, uncompress and patch the source from app.src
+	ynh_setup_source --dest_dir="$final_path"
+fi
 
-ynh_install_app_dependencies php php-mbstring php-curl libapache2-mod-xsendfile php-sqlite3 php7.0-pdo
-# Set permissions to app files
-# you may need to make some file and/or directory writeable by www-data (nginx user)
-sudo chown -R root: $src_path
+# FIXME: this should be managed by the core in the future
+# Here, as a packager, you may have to tweak the ownerhsip/permissions
+# such that the appropriate users (e.g. maybe www-data) can access
+# files in some cases.
+# But FOR THE LOVE OF GOD, do not allow r/x for "others" on the entire folder -
+# this will be treated as a security issue.
+chmod 750 "$final_path"
+chmod -R o-rwx "$final_path"
+chown -R $app:www-data "$final_path"
 
-# Create a dedicated nginx config
+#=================================================
+# NGINX CONFIGURATION
+#=================================================
+ynh_script_progression --message="Upgrading NGINX web server configuration..." --time --weight=1
+
+# Create a dedicated NGINX config
 ynh_add_nginx_config
 
 #=================================================
-# CREATE DEDICATED USER
+# UPGRADE DEPENDENCIES
 #=================================================
+ynh_script_progression --message="Upgrading dependencies..." --time --weight=1
 
-# Create a system user
-ynh_system_user_create $app
+ynh_install_app_dependencies $pkg_dependencies
 
 #=================================================
 # PHP-FPM CONFIGURATION
 #=================================================
+ynh_script_progression --message="Upgrading PHP-FPM configuration..." --time --weight=1
 
-# Create a dedicated php-fpm config
-ynh_add_fpm_config
+# Create a dedicated PHP-FPM config
+ynh_add_fpm_config --package="$extra_php_dependencies"
 
 #=================================================
-# SETUP SSOWAT
+# RELOAD NGINX
+#=================================================
+ynh_script_progression --message="Reloading NGINX web server..." --time --weight=1
+
+ynh_systemd_action --service_name=nginx --action=reload
+
+#=================================================
+# END OF SCRIPT
 #=================================================
 
-if [ $is_public -eq 0 ]
-then	# Remove the public access
-	ynh_app_setting_delete $app skipped_uris
-fi
-# Make app public if necessary
-if [ $is_public -eq 1 ]
-then
-	# unprotected_uris allows SSO credentials to be passed anyway
-	ynh_app_setting_set $app unprotected_uris "/"
-fi
+ynh_script_progression --message="Upgrade of $app completed" --time --last
 
-# Reload nginx service
-sudo service nginx reload

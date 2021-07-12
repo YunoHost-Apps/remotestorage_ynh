@@ -18,9 +18,8 @@
     "multi_instance": true,
     "services": [
         "nginx",
-        "php5-fpm"
+        "php7.3-fpm"
     ],
-    "license": "free",
     "arguments": {
         "install" : [
             {
