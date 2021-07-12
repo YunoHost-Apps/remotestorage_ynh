@@ -51,14 +51,14 @@ ynh_app_setting_set --app=$app --key=admin --value=$admin
 #=================================================
 # INSTALL DEPENDENCIES
 #=================================================
-ynh_script_progression --message="Installing dependencies..." --time --weight=1
+ynh_script_progression --message="Installing dependencies..." --weight=1
 
 #ynh_install_app_dependencies $pkg_dependencies
 
 #=================================================
 # CREATE DEDICATED USER
 #=================================================
-ynh_script_progression --message="Configuring system user..." --time --weight=1
+ynh_script_progression --message="Configuring system user..." --weight=1
 
 # Create a system user
 ynh_system_user_create --username=$app --home_dir="$final_path"
@@ -79,7 +79,7 @@ chown -R $app:www-data "$final_path"
 #=================================================
 # NGINX CONFIGURATION
 #=================================================
-ynh_script_progression --message="Configuring NGINX web server..." --time --weight=1
+ynh_script_progression --message="Configuring NGINX web server..." --weight=1
 
 # Create a dedicated NGINX config
 ynh_add_nginx_config
@@ -101,7 +101,7 @@ phpversion=$(ynh_app_setting_get --app=$app --key=phpversion)
 mkdir -p $final_path/data
 
 # Create config/server.yaml
-sudo cp $final_path/config/server.yaml.example $final_path/config/server.yaml
+cp $final_path/config/server.yaml.example $final_path/config/server.yaml
 
 #=================================================
 # INSTALL LYCHEE WITH COMPOSER
@@ -112,9 +112,6 @@ ynh_install_composer --install_args="--ignore-platform-reqs"
 
 # Create first user
 php $final_path/bin/add-user.php $admin $admin_password
-
-# Set right permissions for curl install
-chown -R $app: $final_path
 
 #=================================================
 # SETUP SSOWAT
